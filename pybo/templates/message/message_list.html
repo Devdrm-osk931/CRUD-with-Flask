@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+   {% extends 'base.html' %}
+   {% block content %}
+    <div class="container my-3">
+    <table class="table">
+        <thead class="table">
+        <tr class="thead-light" align="left">
+            <th>번호</th>
+            <th style="width:50%">제목</th>
+            <th>작성자</th>
+            <th>작성일시</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% if message_list.total != 0 %}
+        {% for message in message_list.items %}
+        <tr>
+            <td>{{ message_list.total - ((message_list.page-1) * message_list.per_page) - loop.index0 }}</td>
+            <td class="text-left">
+                <a href="{{ url_for('message.detail', message_id=message.id) }}">{{ message.subject }}</a>
+            </td>
+            <td>{{ message.user.username }}</td>
+            <td>{{ message.create_date|datetime }}</td>
+        </tr>
+        {% endfor %}
+        {% else %}
+        <tr align>
+                <td colspan="3">글이 없어요!</td>
+        </tr>
+        {% endif %}
+        </tbody>
+    </table>
+
+        <a href="{{ url_for('message.create') }}" class="btn btn-sm btn-outline-warning">메세지 작성</a>
+</div>
+{% endblock %}
+</body>
+</html>

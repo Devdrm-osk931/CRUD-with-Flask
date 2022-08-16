@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+{% extends 'base.html' %}
+{% block content %}
+<div class="container my-3">
+    <h2 class="border-bottom py-2">{{ message.subject }}</h2>
+    <div class="card my-3">
+        <div class="card-body">
+            <div class="card-text" style="white-space: pre-line;">{{ message.content }}</div>
+            <div class="d-flex justify-content-end">
+                <div>
+                    <div>작성자: {{ message.user.username }}</div>
+                    <div>작성시간: {{ message.create_date|datetime }}</div>
+                </div>
+            </div>
+            {% if g.user == message.user %}
+        <div class="my-3">
+            <a href="{{ url_for('message.modify', message_id=message.id) }}" class="btn btn-sm btn-outline-warning">수정</a>
+            <a href="#" class="delete btn btn-sm btn-outline-warning" data-uri="{{ url_for('message.delete', message_id=message.id) }}">삭제</a>
+        </div>
+        {% endif %}
+        </div>
+    </div>
+
+
+    <h5 class="border-bottom my-3 py-2">{{ message.comment_set|length }}개의 댓글이 있습니다.</h5>
+    {% for comment in message.comment_set %}
+    <div class="card my-3">
+        <div class="card-body">
+            <div class="card-text" style="white-space: pre-line;">{{ comment.content }}</div>
+            <div class="d-flex justify-content-end">
+                <div>
+                    <div>작성자: {{ comment.user.username }}</div>
+                    <div>작성시간: {{ comment.create_date|datetime }}</div>
+                </div>
+            </div>
+            {% if g.user == comment.user %}
+            <a href="#" class="delete btn btn-sm btn-outline-warning" data-uri="{{ url_for('comment.delete', comment_id=comment.id) }}">삭제</a>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+
+
+    <form action="{{ url_for('comment.create', message_id=message.id) }}" method="post" class="my-3">
+        {{ form.csrf_token }}
+        {% for field, errors in form.errors.items() %}
+        <div class="alert alert-danger" role="alert">
+            <strong>{{ form[field].label }}</strong>: {{ ', '.join(errors) }}
+        </div>
+        {% endfor %}
+        <div class="form-group">
+            <textarea name="content" id="content" class="form-control" rows="10"></textarea>
+        </div>
+        <input type="submit" value="댓글쓰기" class="btn btn-sm btn-outline-warning">
+    </form>
+</div>
+
+{% endblock %}
+{% block script %}
+<script type='text/javascript'>
+$(document).ready(function(){
+    $(".delete").on('click', function() {
+        if(confirm("정말로 삭제하시겠습니까?")) {
+            location.href = $(this).data('uri');
+        }
+    });
+});
+</script>
+{% endblock %}
+</body>
+</html>
